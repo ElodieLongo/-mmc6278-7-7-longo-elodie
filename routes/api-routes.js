@@ -91,7 +91,11 @@ router
 // This route should create a new User
 router.post('/user', async (req, res) => {
   const {username, password} = req.body
+  
   // if the username or password is not provided, return a 400 status
+  if (!password || !username) {
+    return res.status(400).json({ message: "Invalid username or password"})
+  }
   // hash the password using bcrypt.hash and use 10 salt rounds
   // then insert the username and hashed password into the users table
   // and redirect the user to the /login page

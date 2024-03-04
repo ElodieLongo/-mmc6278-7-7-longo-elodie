@@ -128,7 +128,7 @@ main .sale-item:hover .item-img-container p {
   margin-top: calc(var(--space) * 2);
 }
 
-#product-container {
+#product- {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;

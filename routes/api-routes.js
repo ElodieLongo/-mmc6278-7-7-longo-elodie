@@ -47,7 +47,7 @@ router
     res.redirect('/cart')
   })
 
-
+router
   .route('/cart/:cartId')
   .put(checkAuth, async (req, res) => {
     const {quantity} = req.body
@@ -77,7 +77,7 @@ router
     }
     res.status(204).end()
   })
-    .delete(checkAuth, async (req, res) => {
+  .delete(checkAuth, async (req, res) => {
     const [{affectedRows}] = await db.query(
       `DELETE FROM cart WHERE id=? AND user_id=?`,
       [req.params.cartId, req.session.userId]
@@ -89,13 +89,11 @@ router
   })
 
 // This route should create a new User
-    .post('/user', async (req, res) => {
-  try {
-  const { username, password } = req.body
+router.post('/user', async (req, res) => {
+  const {username, password} = req.body
   // if the username or password is not provided, return a 400 status
   if (!(username && password))
-    return res.status(400).send("Must include username and password")
-  
+  return res.status(400).send("Must include username and password")
   // hash the password using bcrypt.hash and use 10 salt rounds
   // then insert the username and hashed password into the users table
   const hash = await bcrypt.hash(password, 10)
@@ -103,36 +101,24 @@ router
     `INSERT INTO users (username, password) VALUES (?,?)`,
   [username, hash]
 )
-  // and redirect the user to the /login page
-res.redirect("/user")
-  } catch(err) {
- // return a 409 status code (the user exists already)    
-    if (err.code === 'ER_DUP_ENTRY')
-    return res.status(409).send( "User already exists")
-      // for any other error, return a 500 status
-    res.status(500).send("Error creating user: " + err.message || err.sqlMessage) 
-  }
-})
 
+  
+// and redirect the user to the /login page
+
+  // if an error occurs with a code property equal to 'ER_DUP_ENTRY'
+  // return a 409 status code (the user exists already)
+  // for any other error, return a 500 status
+
+})
 // This route will log the user in and create the session
 router.post('/login', async (req, res) => {
   const {username, password} = req.body
   // if the username or password is not provided, return a 400 status
-  if (!(username && password))
-    return res.status(400).send("Must include username and password")
   // Query the database by the username for the user
-  const [[user]] = await db.query(
-    `SELECT * FROM users WHERE username=?`,
-    username
-  )
   // If no user is found, return a 400 status code
-  if (!user) return res.status(400).send("user not found")
   // If the user is found, use bcrypt.compare to compare the password to the hash
-  const isCorrectPassword = await bcrypt.compare(password, user.password)
   // If the password is wrong, return a 400 status code
-  if (!isCorrectPassword) return res.status(400).send("incorrect password")
   // If the password matches, set req.session.loggedIn to true
-  [req.session.loggedIn]
   // set req.session.userId to the user's id
   // call req.session.save and in the callback redirect to /
 })
